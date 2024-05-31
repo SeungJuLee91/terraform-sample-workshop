@@ -25,4 +25,7 @@ resource "aws_elb" "default_elb" {
     target              = var.healthcheck
     interval            = 30
   }
+  tags = {
+    git_org = "SeungJuLee91"
+  }
 }

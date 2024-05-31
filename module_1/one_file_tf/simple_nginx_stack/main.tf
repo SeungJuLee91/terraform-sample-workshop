@@ -27,7 +27,8 @@ resource "aws_vpc" "vpc" {
   instance_tenancy     = "default"
 
   tags = {
-    Name = var.vpc_name
+    Name    = var.vpc_name
+    git_org = "SeungJuLee91"
   }
 }
 
@@ -39,7 +40,8 @@ resource "aws_subnet" "private_subnet" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "private-${element(data.aws_availability_zones.all.names, count.index)}-subnet"
+    Name    = "private-${element(data.aws_availability_zones.all.names, count.index)}-subnet"
+    git_org = "SeungJuLee91"
   }
 
   depends_on = [aws_vpc.vpc]
@@ -53,7 +55,8 @@ resource "aws_subnet" "public_subnet" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "public-${element(data.aws_availability_zones.all.names, count.index)}-subnet"
+    Name    = "public-${element(data.aws_availability_zones.all.names, count.index)}-subnet"
+    git_org = "SeungJuLee91"
   }
 
   depends_on = [aws_vpc.vpc]
@@ -62,12 +65,18 @@ resource "aws_subnet" "public_subnet" {
 resource "aws_internet_gateway" "internet_gateway" {
   vpc_id     = aws_vpc.vpc.id
   depends_on = [aws_vpc.vpc]
+  tags = {
+    git_org = "SeungJuLee91"
+  }
 }
 
 resource "aws_eip" "nat_gateway_eip" {
   count      = var.subnet_count
   vpc        = true
   depends_on = [aws_internet_gateway.internet_gateway]
+  tags = {
+    git_org = "SeungJuLee91"
+  }
 }
 
 resource "aws_nat_gateway" "nat_gateway" {
@@ -75,6 +84,9 @@ resource "aws_nat_gateway" "nat_gateway" {
   allocation_id = aws_eip.nat_gateway_eip.*.id[count.index]
   subnet_id     = aws_subnet.public_subnet.*.id[count.index]
   depends_on    = [aws_internet_gateway.internet_gateway, aws_subnet.public_subnet]
+  tags = {
+    git_org = "SeungJuLee91"
+  }
 }
 
 resource "aws_route_table" "public" {
@@ -86,7 +98,8 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name = "route_table_public"
+    Name    = "route_table_public"
+    git_org = "SeungJuLee91"
   }
 }
 
@@ -100,7 +113,8 @@ resource "aws_route_table" "private" {
   }
 
   tags = {
-    Name = "route_table_private"
+    Name    = "route_table_private"
+    git_org = "SeungJuLee91"
   }
 }
 
@@ -122,11 +136,17 @@ resource "aws_route53_zone" "main_zone" {
   vpc {
     vpc_id = aws_vpc.vpc.id
   }
+  tags = {
+    git_org = "SeungJuLee91"
+  }
 }
 
 resource "aws_security_group" "vpc_security_group" {
   name   = "aws-${var.vpc_name}-vpc-sg"
   vpc_id = aws_vpc.vpc.id
+  tags = {
+    git_org = "SeungJuLee91"
+  }
 }
 
 resource "aws_security_group_rule" "allow_ssh_internal" {
@@ -163,6 +183,9 @@ resource "aws_security_group" "lc_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    git_org = "SeungJuLee91"
   }
 }
 
@@ -224,6 +247,9 @@ resource "aws_security_group" "lb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = {
+    git_org = "SeungJuLee91"
+  }
 }
 
 resource "aws_security_group_rule" "allow_all" {
@@ -263,4 +289,7 @@ resource "aws_elb" "nginx_lb" {
   }
 
 
+  tags = {
+    git_org = "SeungJuLee91"
+  }
 }
